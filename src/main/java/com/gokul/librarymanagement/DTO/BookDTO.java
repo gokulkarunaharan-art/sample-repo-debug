@@ -13,6 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BookDTO {
 
+    private UUID id;
+
     private String title;
 
     private String author;

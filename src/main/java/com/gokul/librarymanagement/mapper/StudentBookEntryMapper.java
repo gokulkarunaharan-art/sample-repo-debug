@@ -9,7 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface StudentBookEntryMapper {
 
-    @Mapping(source = "book.title", target = "bookName")
+    @Mapping(source = "book.id", target = "bookID")
+    @Mapping(source = "book.title", target = "bookTitle")
     @Mapping(source = "student.name", target = "studentName")
     StudentBookEntryDTO toDTO(StudentBookEntry studentBookEntry);
 

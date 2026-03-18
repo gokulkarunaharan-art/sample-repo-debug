@@ -2,16 +2,16 @@ package com.gokul.librarymanagement.controller;
 
 
 import com.gokul.librarymanagement.DTO.StudentBookEntryDTO;
+import com.gokul.librarymanagement.DTO.borrowRequestDTO;
 import com.gokul.librarymanagement.service.StudentBookEntryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/record")
+@RequestMapping("/api/entry")
 @RequiredArgsConstructor
 public class StudentBookEntryController {
 
@@ -20,6 +20,16 @@ public class StudentBookEntryController {
 
     @GetMapping
     public List<StudentBookEntryDTO> getAllRecords(){
-        return studentBookEntryService.getAllRecords();
+        return studentBookEntryService.getAllStudentBookEntry();
+    }
+
+    @PostMapping
+    public void borrow(@RequestBody borrowRequestDTO borrowRequestDTO){
+        studentBookEntryService.studentBookEntryRequest(borrowRequestDTO);
+    }
+
+    @PostMapping("/return/{entryID}")
+    public void returnBook(@PathVariable("entryID") UUID entryID){
+        studentBookEntryService.returnBook(entryID);
     }
 }
