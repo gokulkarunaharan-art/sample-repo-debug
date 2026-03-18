@@ -10,9 +10,10 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class Register {
+public class StudentBookEntry {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
