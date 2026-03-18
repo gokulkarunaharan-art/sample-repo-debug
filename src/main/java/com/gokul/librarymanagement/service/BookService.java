@@ -25,4 +25,14 @@ public class BookService {
                 }
         ).toList();
     }
+
+    public List<BookDTO> getAllUnborrowedBooks(){
+        return bookRepository.findBooksByAvailableCopiesGreaterThan(0).stream().map(
+                book -> {return bookMapper.bookToBookDTO(book);}
+        ).toList();
+    }
+
+    public void addBook(BookDTO bookDTO) {
+        bookRepository.save(bookMapper.bookDTOToBook(bookDTO));
+    }
 }

@@ -4,9 +4,8 @@ package com.gokul.librarymanagement.controller;
 import com.gokul.librarymanagement.DTO.StudentDTO;
 import com.gokul.librarymanagement.service.StudentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +19,11 @@ public class StudentController {
     @GetMapping
     public List<StudentDTO> getAllStudents(){
         return studentService.getAllStudents();
+    }
+
+    @PostMapping
+    public void addStudent(@RequestBody @Validated StudentDTO studentDTO){
+        studentService.addStudent(studentDTO);
     }
 
 }

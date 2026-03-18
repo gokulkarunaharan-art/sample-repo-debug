@@ -24,4 +24,8 @@ public class StudentService {
                 }
         ).toList();
     }
+
+    public void addStudent(StudentDTO studentDTO) {
+        studentRepository.save(studentMapper.studentDTOToStudent(studentDTO));
+    }
 }

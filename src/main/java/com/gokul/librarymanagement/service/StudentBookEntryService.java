@@ -77,4 +77,24 @@ public class StudentBookEntryService {
         }
         // handle or throw entry not found exception
     }
+
+    public List<StudentBookEntryDTO> getAllActiveEntries() {
+        return studentBookEntryRepository.findAllByStatus(BorrowStatus.ACTIVE).stream().map(
+                studentBookEntry -> {
+                    return studentBookEntryMapper.toDTO(studentBookEntry);
+                }
+        ).toList();
+    }
+
+    public List<StudentBookEntryDTO> getAllEntriesByBook(UUID bookID) {
+       return studentBookEntryRepository.findAllByBook_Id(bookID).stream().map(
+               studentBookEntry -> {return studentBookEntryMapper.toDTO(studentBookEntry);}
+       ).toList();
+    }
+
+    public List<StudentBookEntryDTO> getAllEntriesByStudent(UUID studentID) {
+        return studentBookEntryRepository.findAllByStudent_Id(studentID).stream().map(
+                studentBookEntry -> {return studentBookEntryMapper.toDTO(studentBookEntry);}
+        ).toList();
+    }
 }

@@ -3,9 +3,8 @@ package com.gokul.librarymanagement.controller;
 import com.gokul.librarymanagement.DTO.BookDTO;
 import com.gokul.librarymanagement.service.BookService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,4 +22,13 @@ public class BookController {
         return bookService.getAllBooks();
     }
 
+    @GetMapping("/available")
+    public List<BookDTO> getAllAvailableBooks(){
+        return bookService.getAllUnborrowedBooks();
+    }
+
+    @PostMapping
+    public void addBook(@RequestBody @Validated BookDTO bookDTO){
+        bookService.addBook(bookDTO);
+    }
 }

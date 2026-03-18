@@ -1,7 +1,9 @@
 package com.gokul.librarymanagement.DTO;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,13 +15,19 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BookDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
+    @NotBlank(message = "Title should not be blank")
     private String title;
 
+    @NotBlank(message = "author should not be blank")
     private String author;
 
-    private int totalCopies;
+    @NotNull(message = "totalCopies should not be null")
+    private Integer totalCopies;
 
-    private int availableCopies;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer availableCopies;
+
 }
