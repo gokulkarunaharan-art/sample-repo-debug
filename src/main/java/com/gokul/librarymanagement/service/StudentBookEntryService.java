@@ -2,7 +2,6 @@ package com.gokul.librarymanagement.service;
 
 import com.gokul.librarymanagement.DTO.StudentBookEntryDTO;
 import com.gokul.librarymanagement.DTO.BorrowRequestDTO;
-import com.gokul.librarymanagement.exception.BookNotAvailableException;
 import com.gokul.librarymanagement.exception.BorrowLimitExceededException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.StudentBookEntryMapper;
@@ -43,7 +42,7 @@ public class StudentBookEntryService {
 
         //checking if the book is available
         if(book.getAvailableCopies() <= 0){
-            throw new BookNotAvailableException();
+            throw new ResourceNotFoundException("No Available Copies of the requested book");
         }
         //checking if the user already taken the book
         if(studentBookEntryRepository.findByBookAndStudentAndStatus(book,student,BorrowStatus.ACTIVE).isPresent()){
@@ -73,7 +72,9 @@ public class StudentBookEntryService {
             entry.setStatus(BorrowStatus.RETURNED);
             studentBookEntryRepository.save(entry);
         }
-        throw new ResourceNotFoundException("Entry Not Found With ID "+entryID);
+        else{
+            throw new ResourceNotFoundException("Entry Not Found With ID "+entryID);
+        }
     }
 
     public List<StudentBookEntryDTO> getAllActiveEntries() {

@@ -12,11 +12,6 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BookNotAvailableException.class)
-    public ResponseEntity<String> handleBookNotAvailableException() {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Book Not Available");
-    }
-
     @ExceptionHandler(BorrowLimitExceededException.class)
     public ResponseEntity<String> handleBorrowLimitExceededException() {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot take two copies of the same book");
@@ -36,5 +31,12 @@ public class GlobalExceptionHandler {
         Map<String, String> map = new HashMap<>();
         map.put("message: ",ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+    }
+
+    @ExceptionHandler(OperationNotAllowedException.class)
+    public ResponseEntity<Map<String, String>> handleOperationNotAllowedException(OperationNotAllowedException ex){
+        Map<String, String> map = new HashMap<>();
+        map.put("message: ",ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(map);
     }
 }
