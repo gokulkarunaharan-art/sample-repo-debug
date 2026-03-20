@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import java.util.UUID;
 
 
 @RestController
@@ -30,5 +30,10 @@ public class BookController {
     @PostMapping
     public void addBook(@RequestBody @Validated BookDTO bookDTO){
         bookService.addBook(bookDTO);
+    }
+
+    @DeleteMapping("/{bookId}")
+    public void deleteBook(@PathVariable("bookId") UUID bookId){
+
     }
 }

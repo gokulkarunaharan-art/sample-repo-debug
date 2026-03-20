@@ -19,9 +19,7 @@ public class StudentService {
 
     public List<StudentDTO> getAllStudents(){
         return studentRepository.findAll().stream().map(
-                student -> {
-                    return studentMapper.studentToStudentDTO(student);
-                }
+                studentMapper::studentToStudentDTO
         ).toList();
     }
 

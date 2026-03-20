@@ -17,12 +17,9 @@ public class BookService {
     private final BookMapper bookMapper;
 
 
-
     public List<BookDTO> getAllBooks(){
         return bookRepository.findAll().stream().map(
-                book -> {
-                    return bookMapper.bookToBookDTO(book);
-                }
+                bookMapper::bookToBookDTO
         ).toList();
     }
 

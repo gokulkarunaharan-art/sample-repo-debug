@@ -1,9 +1,10 @@
 package com.gokul.librarymanagement.service;
 
 import com.gokul.librarymanagement.DTO.StudentBookEntryDTO;
-import com.gokul.librarymanagement.DTO.borrowRequestDTO;
+import com.gokul.librarymanagement.DTO.BorrowRequestDTO;
 import com.gokul.librarymanagement.exception.BookNotAvailableException;
 import com.gokul.librarymanagement.exception.BorrowLimitExceededException;
+import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.StudentBookEntryMapper;
 import com.gokul.librarymanagement.model.Book;
 import com.gokul.librarymanagement.model.BorrowStatus;
@@ -30,26 +31,23 @@ public class StudentBookEntryService {
 
     public List<StudentBookEntryDTO> getAllStudentBookEntry(){
         return studentBookEntryRepository.findAll().stream().map(
-                studentBookEntry->{
-                    return studentBookEntryMapper.toDTO(studentBookEntry);
-                }
+                studentBookEntryMapper::toDTO
         ).toList();
     }
 
-    public void studentBookEntryRequest(borrowRequestDTO borrowRequestDTO){
-        Student student = studentRepository.findById(borrowRequestDTO.getStudentID()).orElse(null);
-        //should handle the null student case
-        Book book = bookRepository.findById(borrowRequestDTO.getBookId()).orElseThrow(()->new BookNotAvailableException());
-        //should handle the null book case
-
-        //checking if the user already taken the book
-        if(studentBookEntryRepository.findByBookAndStudentAndStatus(book,student,BorrowStatus.ACTIVE).isPresent()){
-            throw new BorrowLimitExceededException();
-        }
+    public void studentBookEntryRequest(BorrowRequestDTO borrowRequestDTO){
+        Student student = studentRepository.findById(borrowRequestDTO.getStudentID()).orElseThrow(
+                () -> new ResourceNotFoundException("Student not found with ID "+borrowRequestDTO.getStudentID()));
+        Book book = bookRepository.findById(borrowRequestDTO.getBookId()).orElseThrow(
+                () -> new ResourceNotFoundException("Book not found with ID "+borrowRequestDTO.getBookId()));
 
         //checking if the book is available
         if(book.getAvailableCopies() <= 0){
             throw new BookNotAvailableException();
+        }
+        //checking if the user already taken the book
+        if(studentBookEntryRepository.findByBookAndStudentAndStatus(book,student,BorrowStatus.ACTIVE).isPresent()){
+            throw new BorrowLimitExceededException();
         }
 
         StudentBookEntry entry = StudentBookEntry.builder()
@@ -75,26 +73,24 @@ public class StudentBookEntryService {
             entry.setStatus(BorrowStatus.RETURNED);
             studentBookEntryRepository.save(entry);
         }
-        // handle or throw entry not found exception
+        throw new ResourceNotFoundException("Entry Not Found With ID "+entryID);
     }
 
     public List<StudentBookEntryDTO> getAllActiveEntries() {
         return studentBookEntryRepository.findAllByStatus(BorrowStatus.ACTIVE).stream().map(
-                studentBookEntry -> {
-                    return studentBookEntryMapper.toDTO(studentBookEntry);
-                }
+                studentBookEntryMapper::toDTO
         ).toList();
     }
 
     public List<StudentBookEntryDTO> getAllEntriesByBook(UUID bookID) {
        return studentBookEntryRepository.findAllByBook_Id(bookID).stream().map(
-               studentBookEntry -> {return studentBookEntryMapper.toDTO(studentBookEntry);}
+               studentBookEntryMapper::toDTO
        ).toList();
     }
 
     public List<StudentBookEntryDTO> getAllEntriesByStudent(UUID studentID) {
         return studentBookEntryRepository.findAllByStudent_Id(studentID).stream().map(
-                studentBookEntry -> {return studentBookEntryMapper.toDTO(studentBookEntry);}
+                studentBookEntryMapper::toDTO
         ).toList();
     }
 }

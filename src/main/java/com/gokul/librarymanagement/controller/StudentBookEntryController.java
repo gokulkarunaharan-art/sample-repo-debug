@@ -2,7 +2,7 @@ package com.gokul.librarymanagement.controller;
 
 
 import com.gokul.librarymanagement.DTO.StudentBookEntryDTO;
-import com.gokul.librarymanagement.DTO.borrowRequestDTO;
+import com.gokul.librarymanagement.DTO.BorrowRequestDTO;
 import com.gokul.librarymanagement.service.StudentBookEntryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +25,7 @@ public class StudentBookEntryController {
     }
 
     @PostMapping
-    public void borrow(@RequestBody @Validated borrowRequestDTO borrowRequestDTO){
+    public void borrow(@RequestBody @Validated BorrowRequestDTO borrowRequestDTO){
         studentBookEntryService.studentBookEntryRequest(borrowRequestDTO);
     }
 
@@ -48,5 +48,4 @@ public class StudentBookEntryController {
     public List<StudentBookEntryDTO> getAllEntriesForStudent(@PathVariable("student_id") UUID studentID){
         return studentBookEntryService.getAllEntriesByStudent(studentID);
     }
-
 }
