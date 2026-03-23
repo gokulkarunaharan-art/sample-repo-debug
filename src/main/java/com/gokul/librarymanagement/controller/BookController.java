@@ -5,7 +5,9 @@ import com.gokul.librarymanagement.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,5 +47,9 @@ public class BookController {
     @PatchMapping("/{bookId}/increment")
     public void incrementBook(@PathVariable("bookId") UUID bookId){
         bookService.incrementBook(bookId);
+    }
+    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
+    public void uploadBookCSV(@RequestPart MultipartFile file) throws IOException {
+        bookService.uploadBookCSV(file);
     }
 }

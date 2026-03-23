@@ -23,7 +23,7 @@ public class Book {
 
     private String author;
 
-    private int totalCopies;
+    private Integer totalCopies;
 
-    private int availableCopies;
+    private Integer availableCopies;
 }

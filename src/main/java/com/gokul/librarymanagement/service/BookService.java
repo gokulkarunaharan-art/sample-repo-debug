@@ -5,15 +5,23 @@ import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.BookMapper;
 import com.gokul.librarymanagement.model.Book;
+import com.gokul.librarymanagement.model.BookCSVRepresentation;
 import com.gokul.librarymanagement.model.BorrowStatus;
 import com.gokul.librarymanagement.model.StudentBookEntry;
 import com.gokul.librarymanagement.repository.BookRepository;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,5 +88,24 @@ public class BookService {
         //incrementing total copies
         book.setTotalCopies(book.getTotalCopies()+1);
         bookRepository.save(book);
+    }
+
+    public void uploadBookCSV(MultipartFile file) throws IOException {
+        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))){
+
+            CsvToBean<BookCSVRepresentation> csvToBean = new CsvToBeanBuilder<BookCSVRepresentation>(reader)
+                    .withType(BookCSVRepresentation.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
+
+            List<BookDTO> bookDTOS = csvToBean.parse().stream().map(line->{
+                return BookDTO.builder()
+                        .title(line.getTitle())
+                        .author(line.getAuthor())
+                        .totalCopies(line.getTotalCopies())
+                        .build();
+            }).toList();
+            bookDTOS.forEach(this::addBook);
+        }
     }
 }
