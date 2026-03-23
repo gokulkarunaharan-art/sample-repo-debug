@@ -2,6 +2,7 @@ package com.gokul.librarymanagement.service;
 
 import com.gokul.librarymanagement.DTO.BookDTO;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
+import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.BookMapper;
 import com.gokul.librarymanagement.model.Book;
 import com.gokul.librarymanagement.model.BorrowStatus;
@@ -51,5 +52,26 @@ public class BookService {
             throw new OperationNotAllowedException("Book has active borrows, cannot delete");
         }
         bookRepository.deleteById(bookId);
+    }
+
+    public void decrementBook(UUID bookId) {
+        //decrementing available copies
+        Book book = bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException("Book Not Found"));
+        if(book.getAvailableCopies() <= 0){
+            throw new OperationNotAllowedException("Book Count is already 0, Cannot decrement");
+        }
+        book.setAvailableCopies(book.getAvailableCopies()-1);
+        book.setTotalCopies(book.getTotalCopies()-1);
+        bookRepository.save(book);
+    }
+
+    public void incrementBook(UUID bookId) {
+        //incrementing available copies
+        Book book = bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException("Book Not Found"));
+        book.setAvailableCopies(book.getAvailableCopies()+1);
+
+        //incrementing total copies
+        book.setTotalCopies(book.getTotalCopies()+1);
+        bookRepository.save(book);
     }
 }

@@ -27,9 +27,9 @@ public class StudentController {
         studentService.addStudent(studentDTO);
     }
 
-    @DeleteMapping
-    public void deleteStudent(UUID studentId){
-
+    @DeleteMapping("/{studentId}")
+    public void deleteStudent(@PathVariable UUID studentId){
+        studentService.deleteStudent(studentId);
     }
 
 }

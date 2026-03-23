@@ -33,7 +33,17 @@ public class BookController {
     }
 
     @DeleteMapping("/{bookId}")
-    public void deleteBook(@PathVariable("bookId") UUID bookId){
+    public void deleteBook(@PathVariable UUID bookId){
         bookService.deleteBook(bookId);
+    }
+
+    @PatchMapping("/{bookId}/decrement")
+    public void decrementBook(@PathVariable("bookId") UUID bookId){
+        bookService.decrementBook(bookId);
+    }
+
+    @PatchMapping("/{bookId}/increment")
+    public void incrementBook(@PathVariable("bookId") UUID bookId){
+        bookService.incrementBook(bookId);
     }
 }

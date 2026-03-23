@@ -26,4 +26,6 @@ public interface StudentBookEntryRepository extends JpaRepository<StudentBookEnt
 
     List<StudentBookEntry> findAllByStudent_Id(UUID studentId);
 
+    int countStudentBookEntriesByBook(Book book);
+
 }
