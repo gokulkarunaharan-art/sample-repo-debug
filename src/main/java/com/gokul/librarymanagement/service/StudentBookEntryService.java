@@ -51,7 +51,9 @@ public class StudentBookEntryService {
 
         StudentBookEntry entry = StudentBookEntry.builder()
                 .book(book)
+                .bookTitle(book.getTitle())
                 .student(student)
+                .studentName(student.getName())
                 .borrowedAt(LocalDateTime.now())
                 .returnedAt(null)
                 .status(BorrowStatus.ACTIVE)

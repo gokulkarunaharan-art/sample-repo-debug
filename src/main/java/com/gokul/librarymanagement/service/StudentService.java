@@ -2,8 +2,10 @@ package com.gokul.librarymanagement.service;
 
 
 import com.gokul.librarymanagement.DTO.StudentDTO;
+import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.mapper.StudentMapper;
 import com.gokul.librarymanagement.model.BorrowStatus;
+import com.gokul.librarymanagement.model.StudentBookEntry;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +34,16 @@ public class StudentService {
     }
 
     public void deleteStudent(UUID studentId){
-        boolean hasActiceEntry = studentBookEntryRepository.findAllByStudent_Id(studentId)
+        List<StudentBookEntry>  entries = studentBookEntryRepository.findAllByStudent_Id(studentId);
+        boolean hasActiceEntry = entries
                 .stream().anyMatch(studentBookEntry -> studentBookEntry.getStatus() == BorrowStatus.ACTIVE);
         if(hasActiceEntry){
-
+            throw new OperationNotAllowedException("Student has active entries, cannot be deleted");
+        }
+        else{
+            entries.forEach(studentBookEntry -> {studentBookEntry.setStudent(null);});
+            studentBookEntryRepository.saveAll(entries);
+            studentRepository.deleteById(studentId);
         }
     }
 }

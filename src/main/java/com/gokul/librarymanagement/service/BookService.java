@@ -6,10 +6,12 @@ import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.BookMapper;
 import com.gokul.librarymanagement.model.Book;
 import com.gokul.librarymanagement.model.BorrowStatus;
+import com.gokul.librarymanagement.model.StudentBookEntry;
 import com.gokul.librarymanagement.repository.BookRepository;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,15 +44,19 @@ public class BookService {
         bookRepository.save(book);
     }
 
+    @Transactional
     public void deleteBook(UUID bookId) {
-        boolean hasActiveBorrows = studentBookEntryRepository
-                .findAllByBook_Id(bookId)
+        List<StudentBookEntry> entries = studentBookEntryRepository.findAllByBook_Id(bookId);
+
+        boolean hasActiveBorrows = entries
                 .stream().anyMatch(
                         studentBookEntry -> studentBookEntry.getStatus() == BorrowStatus.ACTIVE
                                     );
         if (hasActiveBorrows) {
             throw new OperationNotAllowedException("Book has active borrows, cannot delete");
         }
+        entries.forEach(e -> e.setBook(null));
+        studentBookEntryRepository.saveAll(entries);
         bookRepository.deleteById(bookId);
     }
 

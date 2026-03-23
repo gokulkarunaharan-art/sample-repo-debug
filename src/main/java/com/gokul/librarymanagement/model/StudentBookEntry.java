@@ -19,12 +19,16 @@ public class StudentBookEntry {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "book_id", nullable = true)
     private Book book;
 
+    private String bookTitle;
+
     @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = true)
     private Student student;
+
+    private String studentName;
 
     private LocalDateTime borrowedAt;
 
