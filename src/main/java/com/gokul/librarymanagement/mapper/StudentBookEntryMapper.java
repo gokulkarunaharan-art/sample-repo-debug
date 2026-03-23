@@ -10,8 +10,6 @@ import org.mapstruct.Mapping;
 public interface StudentBookEntryMapper {
 
     @Mapping(source = "book.id", target = "bookID")
-    @Mapping(source = "book.title", target = "bookTitle")
-    @Mapping(source = "student.name", target = "studentName")
     StudentBookEntryDTO toDTO(StudentBookEntry studentBookEntry);
 
 }

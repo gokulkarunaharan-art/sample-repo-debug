@@ -30,6 +30,10 @@ public class StudentService {
     }
 
     public void addStudent(StudentDTO studentDTO) {
+        if (studentRepository.countStudentByEmail(studentDTO.getEmail().toLowerCase()) > 0){
+            throw new OperationNotAllowedException("student with mail already found!");
+        }
+        studentDTO.setEmail(studentDTO.getEmail().toLowerCase());
         studentRepository.save(studentMapper.studentDTOToStudent(studentDTO));
     }
 
