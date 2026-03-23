@@ -43,7 +43,7 @@ public class BookService {
 
     public List<BookDTO> getAllUnborrowedBooks(){
         return bookRepository.findBooksByAvailableCopiesGreaterThan(0).stream().map(
-                book -> {return bookMapper.bookToBookDTO(book);}
+                bookMapper::bookToBookDTO
         ).toList();
     }
 
