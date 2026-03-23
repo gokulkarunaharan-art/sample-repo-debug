@@ -10,6 +10,7 @@ import com.gokul.librarymanagement.model.StudentBookEntry;
 import com.gokul.librarymanagement.repository.BookRepository;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class BookService {
 
 
     public List<BookDTO> getAllBooks(){
-        return bookRepository.findAll().stream().map(
+        return bookRepository.findAll(Sort.by(Sort.Direction.DESC,"availableCopies")).stream().map(
                 bookMapper::bookToBookDTO
         ).toList();
     }
