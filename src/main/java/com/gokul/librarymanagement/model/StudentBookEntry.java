@@ -34,5 +34,6 @@ public class StudentBookEntry {
 
     private LocalDateTime returnedAt;
 
+    @Enumerated(EnumType.STRING)
     private BorrowStatus status;
 }
