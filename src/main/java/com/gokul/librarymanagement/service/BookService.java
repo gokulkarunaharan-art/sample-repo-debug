@@ -46,7 +46,7 @@ public class BookService {
 
     @Transactional
     public void deleteBook(UUID bookId) {
-        List<StudentBookEntry> entries = studentBookEntryRepository.findAllByBook_Id(bookId);
+        List<StudentBookEntry> entries = getAllEntriesByBook(bookId);
 
         boolean hasActiveBorrows = entries
                 .stream().anyMatch(
@@ -79,5 +79,10 @@ public class BookService {
         //incrementing total copies
         book.setTotalCopies(book.getTotalCopies()+1);
         bookRepository.save(book);
+    }
+
+    public List<StudentBookEntry> getAllEntriesByBook(UUID bookId){
+        Book book = bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
+        return book.getStudentBookEntries().stream().toList();
     }
 }

@@ -18,7 +18,6 @@ public class StudentBookEntryController {
 
     private final StudentBookEntryService studentBookEntryService;
 
-
     @GetMapping
     public List<StudentBookEntryDTO> getAllRecords(){
         return studentBookEntryService.getAllStudentBookEntry();

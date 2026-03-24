@@ -3,8 +3,11 @@ package com.gokul.librarymanagement.service;
 
 import com.gokul.librarymanagement.DTO.StudentDTO;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
+import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.StudentMapper;
+import com.gokul.librarymanagement.model.Book;
 import com.gokul.librarymanagement.model.BorrowStatus;
+import com.gokul.librarymanagement.model.Student;
 import com.gokul.librarymanagement.model.StudentBookEntry;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
@@ -38,7 +41,7 @@ public class StudentService {
     }
 
     public void deleteStudent(UUID studentId){
-        List<StudentBookEntry>  entries = studentBookEntryRepository.findAllByStudent_Id(studentId);
+        List<StudentBookEntry>  entries = getAllEntriesByStudent(studentId);
         boolean hasActiceEntry = entries
                 .stream().anyMatch(studentBookEntry -> studentBookEntry.getStatus() == BorrowStatus.ACTIVE);
         if(hasActiceEntry){
@@ -49,5 +52,9 @@ public class StudentService {
             studentBookEntryRepository.saveAll(entries);
             studentRepository.deleteById(studentId);
         }
+    }
+    public List<StudentBookEntry> getAllEntriesByStudent(UUID studentId){
+        Student student = studentRepository.findById(studentId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
+        return student.getStudentBookEntries().stream().toList();
     }
 }

@@ -4,6 +4,7 @@ package com.gokul.librarymanagement.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -26,4 +27,7 @@ public class Book {
     private int totalCopies;
 
     private int availableCopies;
+
+    @OneToMany(mappedBy = "book")
+    private Set<StudentBookEntry> studentBookEntries;
 }
