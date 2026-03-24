@@ -3,6 +3,10 @@ package com.gokul.librarymanagement.controller;
 import com.gokul.librarymanagement.DTO.BookDTO;
 import com.gokul.librarymanagement.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +24,11 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public List<BookDTO> getAllBooks(){
-        return bookService.getAllBooks();
+    public Page<BookDTO> getAllBooks(
+            @PageableDefault(size = 25, page = 0, sort = "id", direction = Sort.Direction.ASC)Pageable pageable
+            )
+    {
+        return bookService.getAllBooks(pageable);
     }
 
     @GetMapping("/available")

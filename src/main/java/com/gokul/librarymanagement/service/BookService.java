@@ -13,7 +13,9 @@ import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,10 +37,11 @@ public class BookService {
     private final StudentBookEntryRepository studentBookEntryRepository;
 
 
-    public List<BookDTO> getAllBooks(){
-        return bookRepository.findAll(Sort.by(Sort.Direction.DESC,"availableCopies")).stream().map(
-                bookMapper::bookToBookDTO
-        ).toList();
+    public Page<BookDTO> getAllBooks(Pageable pageable){
+        Page<Book> books;
+//        PageRequest request = buildPageRequest(pageNumber, pageSize);
+        books =  bookRepository.findAll(pageable);
+        return books.map(bookMapper::bookToBookDTO);
     }
 
     public List<BookDTO> getAllUnborrowedBooks(){
@@ -112,5 +115,28 @@ public class BookService {
     public List<StudentBookEntry> getAllEntriesByBook(UUID bookId){
         Book book = bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
         return book.getStudentBookEntries().stream().toList();
+    }
+    private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
+        Integer queryPageNumber;
+        Integer queryPageSize;
+        if(pageNumber == null){
+            queryPageNumber = 0; //default page number
+        }
+        else{
+            queryPageNumber = pageNumber -1;
+        }
+
+        if(pageSize == null){
+            queryPageSize = 25;
+        }
+        else{
+            if(pageSize > 1000){
+                queryPageSize = 1000;
+            }
+            else{
+                queryPageSize = pageSize;
+            }
+        }
+       return PageRequest.of(queryPageNumber,queryPageSize);
     }
 }
