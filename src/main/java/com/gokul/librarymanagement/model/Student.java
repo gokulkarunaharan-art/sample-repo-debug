@@ -3,6 +3,7 @@ package com.gokul.librarymanagement.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -24,4 +25,7 @@ public class Student {
     private String email;
 
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "student")
+    private Set<StudentBookEntry> studentBookEntries;
 }

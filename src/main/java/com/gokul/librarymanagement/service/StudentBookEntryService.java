@@ -14,9 +14,11 @@ import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,6 +27,8 @@ public class StudentBookEntryService {
 
     private final StudentBookEntryRepository studentBookEntryRepository;
     private final StudentBookEntryMapper studentBookEntryMapper;
+    private final BookService bookService;
+    private final StudentService studentService;
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
 
@@ -34,6 +38,7 @@ public class StudentBookEntryService {
         ).toList();
     }
 
+    @Transactional
     public void studentBookEntryRequest(BorrowRequestDTO borrowRequestDTO){
         Student student = studentRepository.findById(borrowRequestDTO.getStudentID()).orElseThrow(
                 () -> new ResourceNotFoundException("Student not found with ID "+borrowRequestDTO.getStudentID()));
@@ -60,7 +65,17 @@ public class StudentBookEntryService {
                 .build();
 
         book.setAvailableCopies(book.getAvailableCopies()-1);
-        bookRepository.save(book);
+
+        Set<StudentBookEntry> oldEntriesOfBook = book.getStudentBookEntries();
+        oldEntriesOfBook.add(entry);
+        book.setStudentBookEntries(oldEntriesOfBook);
+
+        Set<StudentBookEntry> oldEntriesOfStudent = student.getStudentBookEntries();
+        oldEntriesOfStudent.add(entry);
+        student.setStudentBookEntries(oldEntriesOfStudent);
+
+//        bookRepository.save(book);
+//        studentRepository.save(student);
         studentBookEntryRepository.save(entry);
     }
 
@@ -86,15 +101,17 @@ public class StudentBookEntryService {
     }
 
     public List<StudentBookEntryDTO> getAllEntriesByBook(UUID bookID) {
-       return studentBookEntryRepository.findAllByBook_Id(bookID).stream().map(
-               studentBookEntryMapper::toDTO
-       ).toList();
+        return bookService.getAllEntriesByBook(bookID).stream().map(studentBookEntryMapper::toDTO).toList();
+//       return studentBookEntryRepository.findAllByBook_Id(bookID).stream().map(
+//               studentBookEntryMapper::toDTO
+//       ).toList();
     }
 
     public List<StudentBookEntryDTO> getAllEntriesByStudent(UUID studentID) {
-        return studentBookEntryRepository.findAllByStudent_Id(studentID).stream().map(
-                studentBookEntryMapper::toDTO
-        ).toList();
+        return studentService.getAllEntriesByStudent(studentID).stream().map(studentBookEntryMapper::toDTO).toList();
+//        return studentBookEntryRepository.findAllByStudent_Id(studentID).stream().map(
+//                studentBookEntryMapper::toDTO
+//        ).toList();
     }
 }
 //on branch csv sample

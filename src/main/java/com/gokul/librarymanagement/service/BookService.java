@@ -55,7 +55,7 @@ public class BookService {
 
     @Transactional
     public void deleteBook(UUID bookId) {
-        List<StudentBookEntry> entries = studentBookEntryRepository.findAllByBook_Id(bookId);
+        List<StudentBookEntry> entries = getAllEntriesByBook(bookId);
 
         boolean hasActiveBorrows = entries
                 .stream().anyMatch(
@@ -90,6 +90,7 @@ public class BookService {
         bookRepository.save(book);
     }
 
+
     public void uploadBookCSV(MultipartFile file) throws IOException {
         try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))){
 
@@ -106,6 +107,10 @@ public class BookService {
                         .build();
             }).toList();
             bookDTOS.forEach(this::addBook);
-        }
+        }}
+
+    public List<StudentBookEntry> getAllEntriesByBook(UUID bookId){
+        Book book = bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
+        return book.getStudentBookEntries().stream().toList();
     }
 }

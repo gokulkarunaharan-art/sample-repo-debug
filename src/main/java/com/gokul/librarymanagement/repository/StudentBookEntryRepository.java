@@ -21,11 +21,4 @@ public interface StudentBookEntryRepository extends JpaRepository<StudentBookEnt
     );
 
     List<StudentBookEntry> findAllByStatus(BorrowStatus status);
-
-    List<StudentBookEntry> findAllByBook_Id(UUID bookId);
-
-    List<StudentBookEntry> findAllByStudent_Id(UUID studentId);
-
-    int countStudentBookEntriesByBook(Book book);
-
 }
