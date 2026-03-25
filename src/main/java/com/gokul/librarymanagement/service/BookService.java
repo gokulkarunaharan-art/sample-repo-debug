@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -83,36 +82,32 @@ public class BookService {
         bookRepository.save(book);
     }
 
-
     public void uploadBookCSV(MultipartFile file) throws IOException {
         try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))){
-
             CsvToBean<BookCSVRepresentation> csvToBean = new CsvToBeanBuilder<BookCSVRepresentation>(reader)
                     .withType(BookCSVRepresentation.class)
                     .withVerifier(new BookBeanVerifier())
                     .withIgnoreLeadingWhiteSpace(true)
                     .withIgnoreQuotations(true)
                     .build();
-
-            List<BookDTO> bookDTOS = csvToBean.parse().stream().map(line->{
-                boolean exists = bookRepository.existsByTitleIgnoreCaseAndAuthorIgnoreCase(
-                        line.getTitle(), line.getAuthor());
-                return BookDTO.builder()
-                        .title(line.getTitle())
-                        .author(line.getAuthor())
-                        .totalCopies(line.getTotalCopies())
-                        .build();
-            }).toList();
-            bookDTOS.forEach(this::addBook);
+            List<Book> books = csvToBean.parse().stream().filter(line->!bookRepository.existsByTitleIgnoreCaseAndAuthorIgnoreCase(
+                    line.getTitle(), line.getAuthor())).map(line-> Book.builder()
+                            .title(line.getTitle())
+                            .author(line.getAuthor())
+                            .totalCopies(line.getTotalCopies())
+                            .availableCopies(line.getTotalCopies())
+                            .build()).toList();
+            bookRepository.saveAll(books);
         }}
 
     public List<StudentBookEntry> getAllEntriesByBook(UUID bookId){
         Book book = bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
         return book.getStudentBookEntries().stream().toList();
     }
+
     private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
-        Integer queryPageNumber;
-        Integer queryPageSize;
+        int queryPageNumber;
+        int queryPageSize;
         if(pageNumber == null){
             queryPageNumber = 0; //default page number
         }
