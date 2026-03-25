@@ -1,6 +1,7 @@
 package com.gokul.librarymanagement.service;
 
 import com.gokul.librarymanagement.DTO.BookDTO;
+import com.gokul.librarymanagement.DTO.UploadSummaryDTO;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.BookMapper;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -82,23 +84,45 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    public void uploadBookCSV(MultipartFile file) throws IOException {
-        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))){
+    public UploadSummaryDTO uploadBookCSV(MultipartFile file) throws IOException {
+        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+
             CsvToBean<BookCSVRepresentation> csvToBean = new CsvToBeanBuilder<BookCSVRepresentation>(reader)
                     .withType(BookCSVRepresentation.class)
                     .withVerifier(new BookBeanVerifier())
                     .withIgnoreLeadingWhiteSpace(true)
                     .withIgnoreQuotations(true)
                     .build();
-            List<Book> books = csvToBean.parse().stream().filter(line->!bookRepository.existsByTitleIgnoreCaseAndAuthorIgnoreCase(
-                    line.getTitle(), line.getAuthor())).map(line-> Book.builder()
+
+            List<BookCSVRepresentation> parsed = csvToBean.parse();
+            int totalRows = parsed.size();
+
+            // Step A — extract keys from CSV
+            List<String> keys = parsed.stream()
+                    .map(line -> (line.getTitle() + "|" + line.getAuthor()).toLowerCase())
+                    .toList();
+
+            // Step B — one DB hit, scoped to only CSV candidates
+            Set<String> existingKeys = bookRepository.findExistingTitleAuthorKeys(keys);
+
+            // Step C — filter and map in memory
+            List<Book> books = parsed.stream()
+                    .filter(line -> !existingKeys.contains(
+                            (line.getTitle() + "|" + line.getAuthor()).toLowerCase()))
+                    .map(line -> Book.builder()
                             .title(line.getTitle())
                             .author(line.getAuthor())
                             .totalCopies(line.getTotalCopies())
                             .availableCopies(line.getTotalCopies())
-                            .build()).toList();
+                            .build())
+                    .toList();
+
+            // Step D — batch insert
             bookRepository.saveAll(books);
-        }}
+
+            return new UploadSummaryDTO(totalRows, books.size(), totalRows - books.size());
+        }
+    }
 
     public List<StudentBookEntry> getAllEntriesByBook(UUID bookId){
         Book book = bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));

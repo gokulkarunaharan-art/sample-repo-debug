@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
                 .forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fieldErrors);
     }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException ex){
         Map<String, String> map = new HashMap<>();
@@ -39,4 +40,5 @@ public class GlobalExceptionHandler {
         map.put("message: ",ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(map);
     }
+
 }

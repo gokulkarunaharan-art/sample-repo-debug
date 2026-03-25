@@ -1,8 +1,7 @@
 package com.gokul.librarymanagement.service;
 
-
-import com.gokul.librarymanagement.DTO.BookDTO;
 import com.gokul.librarymanagement.DTO.StudentDTO;
+import com.gokul.librarymanagement.DTO.UploadSummaryDTO;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.StudentMapper;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -64,9 +64,8 @@ public class StudentService {
         Student student = studentRepository.findById(studentId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
         return student.getStudentBookEntries().stream().toList();
     }
-    public void uploadStudentCSV(MultipartFile file) throws IOException {
-        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))){
-
+    public UploadSummaryDTO uploadStudentCSV(MultipartFile file) throws IOException {
+        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<StudentCSVRepresentation> csvToBean = new CsvToBeanBuilder<StudentCSVRepresentation>(reader)
                     .withType(StudentCSVRepresentation.class)
                     .withVerifier(new StudentBeanVerifier())
@@ -74,13 +73,31 @@ public class StudentService {
                     .withIgnoreQuotations(true)
                     .build();
 
-            List<StudentDTO> bookDTOS = csvToBean.parse().stream().map(line->{
-                return StudentDTO.builder()
-                        .email(line.getEmail())
-                        .name(line.getName())
-                        .phoneNumber(line.getPhoneNumber())
-                        .build();
-            }).toList();
-            bookDTOS.forEach(this::addStudent);
-        }}
+            List<StudentCSVRepresentation> parsed = csvToBean.parse();
+            int totalRows = parsed.size();
+
+            // Step A — extract emails from CSV
+            List<String> emails = parsed.stream()
+                    .map(line -> line.getEmail().toLowerCase())
+                    .toList();
+
+            // Step B — one DB hit, scoped to only CSV candidates
+            Set<String> existingEmails = studentRepository.findExistingEmails(emails);
+
+            // Step C — filter and map in memory
+            List<Student> students = parsed.stream()
+                    .filter(line -> !existingEmails.contains(line.getEmail().toLowerCase()))
+                    .map(line -> Student.builder()
+                            .name(line.getName())
+                            .email(line.getEmail().toLowerCase())
+                            .phoneNumber(line.getPhoneNumber())
+                            .build())
+                    .toList();
+
+            // Step D — batch insert
+            studentRepository.saveAll(students);
+
+            return new UploadSummaryDTO(totalRows, students.size(), totalRows - students.size());
+        }
+    }
 }

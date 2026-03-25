@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataPopulator implements CommandLineRunner {
 
-
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
 

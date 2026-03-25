@@ -18,8 +18,7 @@ public class SampleTest {
 
     @Autowired
     private  BookRepository bookRepository;
-
-
+    
     @Test
     public void testLockPessimistic() {
         Book book = bookRepository.findById(UUID.fromString("8fe45876-cfc0-4df2-9a8f-9cb11a5d0ac3")).get();

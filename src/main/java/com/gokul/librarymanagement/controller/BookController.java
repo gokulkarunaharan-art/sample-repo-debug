@@ -1,12 +1,15 @@
 package com.gokul.librarymanagement.controller;
 
 import com.gokul.librarymanagement.DTO.BookDTO;
+import com.gokul.librarymanagement.DTO.UploadSummaryDTO;
 import com.gokul.librarymanagement.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +56,7 @@ public class BookController {
     }
 
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
-    public void uploadBookCSV(@RequestPart MultipartFile file) throws IOException {
-        bookService.uploadBookCSV(file);
+    public ResponseEntity<UploadSummaryDTO> uploadBookCSV(@RequestPart MultipartFile file) throws IOException {
+       return ResponseEntity.status(HttpStatus.OK).body(bookService.uploadBookCSV(file));
     }
 }
