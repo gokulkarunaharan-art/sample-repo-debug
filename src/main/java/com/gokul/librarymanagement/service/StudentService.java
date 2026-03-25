@@ -12,6 +12,8 @@ import com.gokul.librarymanagement.model.StudentBookEntry;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,10 +28,10 @@ public class StudentService {
     private final StudentMapper studentMapper;
     private final StudentBookEntryRepository studentBookEntryRepository;
 
-    public List<StudentDTO> getAllStudents(){
-        return studentRepository.findAll().stream().map(
+    public Page<StudentDTO> getAllStudents(Pageable pageable){
+        return studentRepository.findAll(pageable).map(
                 studentMapper::studentToStudentDTO
-        ).toList();
+        );
     }
 
     public void addStudent(StudentDTO studentDTO) {
