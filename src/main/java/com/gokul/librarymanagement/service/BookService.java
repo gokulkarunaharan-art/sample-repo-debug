@@ -4,10 +4,7 @@ import com.gokul.librarymanagement.DTO.BookDTO;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.BookMapper;
-import com.gokul.librarymanagement.model.Book;
-import com.gokul.librarymanagement.model.BookCSVRepresentation;
-import com.gokul.librarymanagement.model.BorrowStatus;
-import com.gokul.librarymanagement.model.StudentBookEntry;
+import com.gokul.librarymanagement.model.*;
 import com.gokul.librarymanagement.repository.BookRepository;
 import com.gokul.librarymanagement.repository.StudentBookEntryRepository;
 import com.opencsv.bean.CsvToBean;
@@ -99,7 +96,9 @@ public class BookService {
 
             CsvToBean<BookCSVRepresentation> csvToBean = new CsvToBeanBuilder<BookCSVRepresentation>(reader)
                     .withType(BookCSVRepresentation.class)
+                    .withVerifier(new BookBeanVerifier())
                     .withIgnoreLeadingWhiteSpace(true)
+                    .withIgnoreQuotations(true)
                     .build();
 
             List<BookDTO> bookDTOS = csvToBean.parse().stream().map(line->{

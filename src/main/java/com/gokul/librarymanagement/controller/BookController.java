@@ -55,6 +55,7 @@ public class BookController {
     public void incrementBook(@PathVariable("bookId") UUID bookId){
         bookService.incrementBook(bookId);
     }
+
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public void uploadBookCSV(@RequestPart MultipartFile file) throws IOException {
         bookService.uploadBookCSV(file);
