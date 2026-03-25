@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface BookRepository extends JpaRepository<Book, UUID> {
     List<Book> findBooksByAvailableCopiesGreaterThan(int numberOfCopiesToFilter);
+    boolean existsByTitleIgnoreCaseAndAuthorIgnoreCase(String title, String author);
 }

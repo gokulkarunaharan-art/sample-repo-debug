@@ -28,23 +28,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookService {
 
-
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final StudentBookEntryRepository studentBookEntryRepository;
 
 
-    public Page<BookDTO> getAllBooks(Pageable pageable){
-        Page<Book> books;
-//        PageRequest request = buildPageRequest(pageNumber, pageSize);
-        books =  bookRepository.findAll(pageable);
+    public Page<BookDTO> getAllBooks(Pageable pageable) {
+        Page<Book> books =  bookRepository.findAll(pageable);
         return books.map(bookMapper::bookToBookDTO);
     }
 
-    public List<BookDTO> getAllUnborrowedBooks(){
-        return bookRepository.findBooksByAvailableCopiesGreaterThan(0).stream().map(
-                bookMapper::bookToBookDTO
-        ).toList();
+    public List<BookDTO> getAllUnborrowedBooks() {
+        return bookRepository.findBooksByAvailableCopiesGreaterThan(0)
+                .stream().map(bookMapper::bookToBookDTO).toList();
     }
 
     public void addBook(BookDTO bookDTO) {
@@ -57,10 +53,7 @@ public class BookService {
     public void deleteBook(UUID bookId) {
         List<StudentBookEntry> entries = getAllEntriesByBook(bookId);
 
-        boolean hasActiveBorrows = entries
-                .stream().anyMatch(
-                        studentBookEntry -> studentBookEntry.getStatus() == BorrowStatus.ACTIVE
-                                    );
+        boolean hasActiveBorrows = entries.stream().anyMatch(studentBookEntry -> studentBookEntry.getStatus() == BorrowStatus.ACTIVE);
         if (hasActiveBorrows) {
             throw new OperationNotAllowedException("Book has active borrows, cannot delete");
         }
@@ -102,6 +95,8 @@ public class BookService {
                     .build();
 
             List<BookDTO> bookDTOS = csvToBean.parse().stream().map(line->{
+                boolean exists = bookRepository.existsByTitleIgnoreCaseAndAuthorIgnoreCase(
+                        line.getTitle(), line.getAuthor());
                 return BookDTO.builder()
                         .title(line.getTitle())
                         .author(line.getAuthor())
