@@ -16,6 +16,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 public class Book {
+
+    @Version
+    private Integer version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

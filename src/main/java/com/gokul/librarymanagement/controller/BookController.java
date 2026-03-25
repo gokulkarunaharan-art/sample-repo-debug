@@ -20,14 +20,10 @@ import java.util.UUID;
 @RequestMapping("/api/book")
 @RequiredArgsConstructor
 public class BookController {
-
     private final BookService bookService;
 
     @GetMapping
-    public Page<BookDTO> getAllBooks(
-            @PageableDefault(size = 25, page = 0, sort = "id", direction = Sort.Direction.ASC)Pageable pageable
-            )
-    {
+    public Page<BookDTO> getAllBooks(@PageableDefault(size = 25, page = 0, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return bookService.getAllBooks(pageable);
     }
 

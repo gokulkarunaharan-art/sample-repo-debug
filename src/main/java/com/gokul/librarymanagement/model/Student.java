@@ -16,6 +16,9 @@ import java.util.UUID;
 @Entity
 public class Student {
 
+    @Version
+    private Integer version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
