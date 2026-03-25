@@ -85,6 +85,12 @@ public class BookService {
     }
 
     public UploadSummaryDTO uploadBookCSV(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty())
+            throw new IllegalArgumentException("CSV file must not be empty");
+
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".csv"))
+            throw new IllegalArgumentException("Only .csv files are accepted");
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
             CsvToBean<BookCSVRepresentation> csvToBean = new CsvToBeanBuilder<BookCSVRepresentation>(reader)

@@ -12,9 +12,12 @@ public class BookBeanVerifier implements BeanVerifier<BookCSVRepresentation> {
         if(bean.getAuthor() == null || bean.getAuthor().isBlank()){
             throw new CsvConstraintViolationException("Author should be valid");
         }
-        if(bean.getTotalCopies() < 0){
-            throw new CsvConstraintViolationException("total copies should be positive and valid");
-        }
+        if (bean.getTotalCopies() == null)
+            throw new CsvConstraintViolationException("totalCopies should not be null");
+
+        if (bean.getTotalCopies() < 1)
+            throw new CsvConstraintViolationException("totalCopies must be at least 1");
+
         return true;
     }
 }

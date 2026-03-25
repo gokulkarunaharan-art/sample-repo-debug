@@ -65,6 +65,13 @@ public class StudentService {
         return student.getStudentBookEntries().stream().toList();
     }
     public UploadSummaryDTO uploadStudentCSV(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty())
+            throw new IllegalArgumentException("CSV file must not be empty");
+
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".csv"))
+            throw new IllegalArgumentException("Only .csv files are accepted");
+
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             CsvToBean<StudentCSVRepresentation> csvToBean = new CsvToBeanBuilder<StudentCSVRepresentation>(reader)
                     .withType(StudentCSVRepresentation.class)
