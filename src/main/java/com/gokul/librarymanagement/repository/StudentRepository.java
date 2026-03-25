@@ -14,7 +14,6 @@ import java.util.UUID;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, UUID> {
     int countStudentByEmail(String email);
-    void deleteById(UUID id);
     @Query("SELECT LOWER(s.email) FROM Student s WHERE LOWER(s.email) IN :emails")
     Set<String> findExistingEmails(@Param("emails") List<String> emails);
 
