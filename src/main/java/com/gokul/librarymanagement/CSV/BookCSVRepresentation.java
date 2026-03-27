@@ -1,4 +1,4 @@
-package com.gokul.librarymanagement.model;
+package com.gokul.librarymanagement.CSV;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.*;
@@ -15,5 +15,5 @@ public class BookCSVRepresentation {
     private String author;
 
     @CsvBindByName(column = "totalCopies")
-    private Integer totalCopies;
+    private String totalCopies;
 }
