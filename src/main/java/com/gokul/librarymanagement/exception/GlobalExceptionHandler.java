@@ -48,4 +48,12 @@ public class GlobalExceptionHandler {
         map.put("message: ",ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
+    @ExceptionHandler(CSVValidationException.class)
+    public ResponseEntity<Map<String,String>> handleCSVValidationException(CSVValidationException ex){
+        Map<String,String> response = new HashMap<>();
+        ex.getExceptions().forEach(exception->{
+            response.put("Row "+String.valueOf(exception.getLineNumber()),exception.getMessage());
+        });
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 }

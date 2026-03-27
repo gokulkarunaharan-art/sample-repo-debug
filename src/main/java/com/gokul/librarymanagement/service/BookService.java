@@ -4,6 +4,7 @@ import com.gokul.librarymanagement.CSV.BookCSVRepresentation;
 import com.gokul.librarymanagement.DTO.BookDTO;
 import com.gokul.librarymanagement.DTO.UploadSummaryDTO;
 import com.gokul.librarymanagement.CSV.validation.BookBeanVerifier;
+import com.gokul.librarymanagement.exception.CSVValidationException;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.BookMapper;
@@ -99,8 +100,13 @@ public class BookService {
                     .withVerifier(new BookBeanVerifier())
                     .withIgnoreLeadingWhiteSpace(true)
                     .withIgnoreQuotations(true)
+                    .withThrowExceptions(false)
                     .build();
 
+            //handling all the collected exceptions
+            if(!csvToBean.getCapturedExceptions().isEmpty()){
+                throw new CSVValidationException(csvToBean.getCapturedExceptions());
+            }
             List<BookCSVRepresentation> parsed = csvToBean.parse();
             int totalRows = parsed.size();
 
