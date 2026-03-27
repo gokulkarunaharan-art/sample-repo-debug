@@ -94,6 +94,11 @@ public class BookService {
         if (filename == null || !filename.toLowerCase().endsWith(".csv"))
             throw new IllegalArgumentException("Only .csv files are accepted");
 
+        //checking if required headers are present
+        String firstLine = new String(file.getBytes()).split("\n")[0].toLowerCase().trim();
+        if (!firstLine.contains("title") || !firstLine.contains("author") || !firstLine.contains("totalcopies")) {
+            throw new IllegalArgumentException("Invalid CSV headers. Expected: title, author, totalCopies");
+        }
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 

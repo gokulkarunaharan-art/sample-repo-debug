@@ -1,7 +1,6 @@
 package com.gokul.librarymanagement.exception;
 
 import com.opencsv.exceptions.CsvConstraintViolationException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -54,13 +53,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String,String>> handleCSVValidationException(CSVValidationException ex){
         Map<String,String> response = new HashMap<>();
         ex.getExceptions().forEach(exception->{
-            if(exception instanceof CsvRequiredFieldEmptyException){
-                response.put("Headers invalid", exception.getMessage());
-            }
-            else{
-                response.put("Row "+ exception.getLineNumber(),exception.getMessage());
-            }
+            response.put("Row "+ exception.getLineNumber(),exception.getMessage());
         });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    //used for header
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> map = new HashMap<>();
+        map.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
     }
 }

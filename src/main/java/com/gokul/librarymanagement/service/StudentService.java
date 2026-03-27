@@ -78,6 +78,12 @@ public class StudentService {
         if (filename == null || !filename.toLowerCase().endsWith(".csv"))
             throw new IllegalArgumentException("Only .csv files are accepted");
 
+        //checking if required headers are present
+        String firstLine = new String(file.getBytes()).split("\n")[0].toLowerCase();
+        if (!firstLine.contains("name") || !firstLine.contains("email") || !firstLine.contains("phonenumber")) {
+            throw new IllegalArgumentException("Invalid CSV headers. Expected: name, email, phoneNumber");
+        }
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
             CsvToBean<StudentCSVRepresentation> csvToBean = new CsvToBeanBuilder<StudentCSVRepresentation>(reader)
