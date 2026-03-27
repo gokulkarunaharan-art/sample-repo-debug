@@ -16,8 +16,10 @@ public class StudentBeanVerifier implements BeanVerifier<StudentCSVRepresentatio
         if (StringUtils.isBlank(line.getEmail()) || !EmailValidator.getInstance().isValid(line.getEmail())) {
             throw new CsvConstraintViolationException(" INVALID CSV: Email should be valid ");
         }
-        if (StringUtils.isBlank(line.getPhoneNumber()) || StringUtils.isAlphanumeric(line.getPhoneNumber()))
-            throw new CsvConstraintViolationException(" INVALID CSV: phoneNumber should not be blank ");
+
+        String phone = line.getPhoneNumber().replace("+", "").trim();
+        if (StringUtils.isBlank(phone) || !StringUtils.isNumeric(phone))
+            throw new CsvConstraintViolationException(" INVALID CSV: phoneNumber should be valid ");
         return true;
     }
 }

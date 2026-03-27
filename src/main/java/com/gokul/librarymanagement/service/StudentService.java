@@ -4,6 +4,7 @@ import com.gokul.librarymanagement.DTO.StudentDTO;
 import com.gokul.librarymanagement.DTO.UploadSummaryDTO;
 import com.gokul.librarymanagement.CSV.validation.StudentBeanVerifier;
 import com.gokul.librarymanagement.CSV.StudentCSVRepresentation;
+import com.gokul.librarymanagement.exception.CSVValidationException;
 import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.StudentMapper;
@@ -35,37 +36,40 @@ public class StudentService {
     private final StudentMapper studentMapper;
     private final StudentBookEntryRepository studentBookEntryRepository;
 
-    public Page<StudentDTO> getAllStudents(Pageable pageable){
+    public Page<StudentDTO> getAllStudents(Pageable pageable) {
         return studentRepository.findAll(pageable).map(
                 studentMapper::studentToStudentDTO
         );
     }
 
     public void addStudent(StudentDTO studentDTO) {
-        if (studentRepository.countStudentByEmail(studentDTO.getEmail().toLowerCase()) > 0){
+        if (studentRepository.countStudentByEmail(studentDTO.getEmail().toLowerCase()) > 0) {
             throw new OperationNotAllowedException("student with mail already found!");
         }
         studentDTO.setEmail(studentDTO.getEmail().toLowerCase());
         studentRepository.save(studentMapper.studentDTOToStudent(studentDTO));
     }
 
-    public void deleteStudent(UUID studentId){
-        List<StudentBookEntry>  entries = getAllEntriesByStudent(studentId);
+    public void deleteStudent(UUID studentId) {
+        List<StudentBookEntry> entries = getAllEntriesByStudent(studentId);
         boolean hasActiceEntry = entries
                 .stream().anyMatch(studentBookEntry -> studentBookEntry.getStatus() == BorrowStatus.ACTIVE);
-        if(hasActiceEntry){
+        if (hasActiceEntry) {
             throw new OperationNotAllowedException("Student has active entries, cannot be deleted");
-        }
-        else{
-            entries.forEach(studentBookEntry -> {studentBookEntry.setStudent(null);});
+        } else {
+            entries.forEach(studentBookEntry -> {
+                studentBookEntry.setStudent(null);
+            });
             studentBookEntryRepository.saveAll(entries);
             studentRepository.deleteById(studentId);
         }
     }
-    public List<StudentBookEntry> getAllEntriesByStudent(UUID studentId){
-        Student student = studentRepository.findById(studentId).orElseThrow(()->new ResourceNotFoundException("Student with given id is not available"));
+
+    public List<StudentBookEntry> getAllEntriesByStudent(UUID studentId) {
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Student with given id is not available"));
         return student.getStudentBookEntries().stream().toList();
     }
+
     public UploadSummaryDTO uploadStudentCSV(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty())
             throw new IllegalArgumentException("CSV file must not be empty");
@@ -74,15 +78,23 @@ public class StudentService {
         if (filename == null || !filename.toLowerCase().endsWith(".csv"))
             throw new IllegalArgumentException("Only .csv files are accepted");
 
-        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+
             CsvToBean<StudentCSVRepresentation> csvToBean = new CsvToBeanBuilder<StudentCSVRepresentation>(reader)
                     .withType(StudentCSVRepresentation.class)
                     .withVerifier(new StudentBeanVerifier())
                     .withIgnoreLeadingWhiteSpace(true)
                     .withIgnoreQuotations(true)
+                    .withThrowExceptions(false)
                     .build();
 
             List<StudentCSVRepresentation> parsed = csvToBean.parse();
+
+            //gathering all collected exceptions
+            if (!csvToBean.getCapturedExceptions().isEmpty()) {
+                throw new CSVValidationException(csvToBean.getCapturedExceptions());
+            }
+
             int totalRows = parsed.size();
 
             // Step A — extract emails from CSV

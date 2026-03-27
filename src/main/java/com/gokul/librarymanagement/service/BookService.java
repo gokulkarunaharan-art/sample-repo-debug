@@ -93,7 +93,9 @@ public class BookService {
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".csv"))
             throw new IllegalArgumentException("Only .csv files are accepted");
-        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
             CsvToBean<BookCSVRepresentation> csvToBean = new CsvToBeanBuilder<BookCSVRepresentation>(reader)
                     .withType(BookCSVRepresentation.class)
@@ -103,11 +105,13 @@ public class BookService {
                     .withThrowExceptions(false)
                     .build();
 
+            List<BookCSVRepresentation> parsed = csvToBean.parse();
+
             //handling all the collected exceptions
-            if(!csvToBean.getCapturedExceptions().isEmpty()){
+            if (!csvToBean.getCapturedExceptions().isEmpty()) {
                 throw new CSVValidationException(csvToBean.getCapturedExceptions());
             }
-            List<BookCSVRepresentation> parsed = csvToBean.parse();
+
             int totalRows = parsed.size();
 
             List<String> keys = parsed.stream().map(line -> (line.getTitle() + "|" + line.getAuthor()).toLowerCase()).toList();

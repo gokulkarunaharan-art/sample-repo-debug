@@ -8,12 +8,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookCSVRepresentation {
-    @CsvBindByName(column = "title")
+    @CsvBindByName(column = "title", required = true)
     private String title;
 
-    @CsvBindByName(column = "author")
+    @CsvBindByName(column = "author", required = true)
     private String author;
 
-    @CsvBindByName(column = "totalCopies")
+    @CsvBindByName(column = "totalCopies", required = true)
     private String totalCopies;
 }
