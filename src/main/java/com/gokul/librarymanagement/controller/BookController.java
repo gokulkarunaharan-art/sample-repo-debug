@@ -26,8 +26,16 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public Page<BookDTO> getAllBooks(@PageableDefault(size = 25, page = 0, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return bookService.getAllBooks(pageable);
+    public Page<BookDTO> getAllBooks
+            (@PageableDefault(size = 25, page = 0, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+             @RequestParam(required = false, name = "bookName") String bookName
+            ) {
+        return bookService.getAllBooks(pageable,bookName);
+    }
+
+    @GetMapping("/{bookId}")
+    public ResponseEntity<BookDTO> getBookById(@PathVariable("bookId") UUID bookId){
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.getBookById(bookId));
     }
 
     @GetMapping("/available")
@@ -36,8 +44,8 @@ public class BookController {
     }
 
     @PostMapping
-    public void addBook(@RequestBody @Validated BookDTO bookDTO) {
-        bookService.addBook(bookDTO);
+    public ResponseEntity<BookDTO> addBook(@RequestBody @Validated BookDTO bookDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(bookDTO));
     }
 
     @DeleteMapping("/{bookId}")

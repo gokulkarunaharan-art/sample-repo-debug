@@ -38,8 +38,15 @@ public class BookService {
     private final StudentBookEntryRepository studentBookEntryRepository;
 
 
-    public Page<BookDTO> getAllBooks(Pageable pageable) {
-        Page<Book> books = bookRepository.findAll(pageable);
+    public Page<BookDTO> getAllBooks(Pageable pageable,String bookName) {
+
+        Page<Book> books;
+        if(bookName != null){
+            books = bookRepository.findBooksByTitleContainingIgnoreCase(bookName,pageable);
+        }
+        else{
+            books = bookRepository.findAll(pageable);
+        }
         return books.map(bookMapper::bookToBookDTO);
     }
 
@@ -47,10 +54,16 @@ public class BookService {
         return bookRepository.findBooksByAvailableCopiesGreaterThan(0).stream().map(bookMapper::bookToBookDTO).toList();
     }
 
-    public void addBook(BookDTO bookDTO) {
+    public BookDTO addBook(BookDTO bookDTO) {
         Book book = bookMapper.bookDTOToBook(bookDTO);
         book.setAvailableCopies(book.getTotalCopies());
         bookRepository.save(book);
+        return bookMapper.bookToBookDTO(book);
+    }
+
+    public BookDTO getBookById(UUID bookId){
+        Book book =  bookRepository.findById(bookId).orElseThrow(()->  new ResourceNotFoundException("Book With Id Not Found"));
+        return bookMapper.bookToBookDTO(book);
     }
 
     @Transactional
