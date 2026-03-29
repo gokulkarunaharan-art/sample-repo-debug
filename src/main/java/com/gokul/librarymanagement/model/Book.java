@@ -31,8 +31,8 @@ public class Book {
     private Integer totalCopies;
 
     private Integer availableCopies;
-    @OneToMany(mappedBy = "book")
 
+    @OneToMany(mappedBy = "book")
     private Set<StudentBookEntry> studentBookEntries;
 
 }
