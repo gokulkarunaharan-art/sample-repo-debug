@@ -167,24 +167,7 @@ public class BookService {
         return book.getStudentBookEntries().stream().toList();
     }
 
-//    private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
-//        int queryPageNumber;
-//        int queryPageSize;
-//        if (pageNumber == null) {
-//            queryPageNumber = 0; //default page number
-//        } else {
-//            queryPageNumber = pageNumber - 1;
-//        }
-//
-//        if (pageSize == null) {
-//            queryPageSize = 25;
-//        } else {
-//            if (pageSize > 1000) {
-//                queryPageSize = 1000;
-//            } else {
-//                queryPageSize = pageSize;
-//            }
-//        }
-//        return PageRequest.of(queryPageNumber, queryPageSize);
-//    }
+    public void updateBook(BookDTO bookDTO, UUID bookId) {
+    }
+
 }
