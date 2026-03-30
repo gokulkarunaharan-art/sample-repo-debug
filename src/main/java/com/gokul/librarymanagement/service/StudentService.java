@@ -102,29 +102,32 @@ public class StudentService {
             }
 
             int totalRows = parsed.size();
+            int totalInserted = 0;
 
-            // Step A — extract emails from CSV
-            List<String> emails = parsed.stream()
-                    .map(line -> line.getEmail().toLowerCase())
-                    .toList();
+            int batchSize = 100;
+            for (int i = 0; i < totalRows; i += batchSize) {
+                List<StudentCSVRepresentation> batch = parsed.subList(i, Math.min(i + batchSize, totalRows));
 
-            // Step B — one DB hit, scoped to only CSV candidates
-            Set<String> existingEmails = studentRepository.findExistingEmails(emails);
+                List<String> emails = batch.stream()
+                        .map(line -> line.getEmail().toLowerCase())
+                        .toList();
 
-            // Step C — filter and map in memory
-            List<Student> students = parsed.stream()
-                    .filter(line -> !existingEmails.contains(line.getEmail().toLowerCase()))
-                    .map(line -> Student.builder()
-                            .name(line.getName())
-                            .email(line.getEmail().toLowerCase())
-                            .phoneNumber(line.getPhoneNumber())
-                            .build())
-                    .toList();
+                Set<String> existingEmails = studentRepository.findExistingEmails(emails);
 
-            // Step D — batch insert
-            studentRepository.saveAll(students);
+                List<Student> students = batch.stream()
+                        .filter(line -> !existingEmails.contains(line.getEmail().toLowerCase()))
+                        .map(line -> Student.builder()
+                                .name(line.getName())
+                                .email(line.getEmail().toLowerCase())
+                                .phoneNumber(line.getPhoneNumber())
+                                .build())
+                        .toList();
 
-            return new UploadSummaryDTO(totalRows, students.size(), totalRows - students.size());
+                studentRepository.saveAll(students);
+                totalInserted += students.size();
+            }
+
+            return new UploadSummaryDTO(totalRows, totalInserted, totalRows - totalInserted);
         }
     }
 }

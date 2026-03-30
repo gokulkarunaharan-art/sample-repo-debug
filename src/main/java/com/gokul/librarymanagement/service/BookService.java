@@ -131,19 +131,34 @@ public class BookService {
             }
 
             int totalRows = parsed.size();
+            int totalInserted = 0;
 
-            List<String> keys = parsed.stream().map(line -> (line.getTitle() + "|" + line.getAuthor()).toLowerCase()).toList();
+            //  Split the parsed list into batches of 100
+            int batchSize = 100;
+            for (int i = 0; i < totalRows; i += batchSize) {
+                List<BookCSVRepresentation> batch = parsed.subList(i, Math.min(i + batchSize, totalRows));
 
-            Set<String> existingKeys = bookRepository.findExistingTitleAuthorKeys(keys);
+                // Same logic as before, but only for this batch
+                List<String> keys = batch.stream()
+                        .map(line -> (line.getTitle() + "|" + line.getAuthor()).toLowerCase())
+                        .toList();
 
-            List<Book> books = parsed.stream()
-                    .filter(line -> !existingKeys.contains((line.getTitle() + "|" + line.getAuthor()).toLowerCase()))
-                    .map(line -> Book.builder().title(line.getTitle()).author(line.getAuthor()).totalCopies(Integer.parseInt(line.getTotalCopies())).availableCopies(Integer.parseInt(line.getTotalCopies())).build())
-                    .toList();
+                Set<String> existingKeys = bookRepository.findExistingTitleAuthorKeys(keys);
 
-            bookRepository.saveAll(books);
+                List<Book> books = batch.stream()
+                        .filter(line -> !existingKeys.contains((line.getTitle() + "|" + line.getAuthor()).toLowerCase()))
+                        .map(line -> Book.builder()
+                                .title(line.getTitle())
+                                .author(line.getAuthor())
+                                .totalCopies(Integer.parseInt(line.getTotalCopies()))
+                                .availableCopies(Integer.parseInt(line.getTotalCopies()))
+                                .build())
+                        .toList();
 
-            return new UploadSummaryDTO(totalRows, books.size(), totalRows - books.size());
+                bookRepository.saveAll(books);
+                totalInserted += books.size();
+            }
+            return new UploadSummaryDTO(totalRows, totalInserted, totalRows - totalInserted);
         }
     }
 
