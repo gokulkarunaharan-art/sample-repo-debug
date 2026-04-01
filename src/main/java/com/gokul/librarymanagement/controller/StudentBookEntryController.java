@@ -5,6 +5,7 @@ import com.gokul.librarymanagement.DTO.StudentBookEntryDTO;
 import com.gokul.librarymanagement.DTO.BorrowRequestDTO;
 import com.gokul.librarymanagement.service.StudentBookEntryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/entry")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('LIBRARIAN')")
 public class StudentBookEntryController {
 
     private final StudentBookEntryService studentBookEntryService;
@@ -24,11 +26,13 @@ public class StudentBookEntryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('BORROW')")
     public void borrow(@RequestBody @Validated BorrowRequestDTO borrowRequestDTO){
         studentBookEntryService.studentBookEntryRequest(borrowRequestDTO);
     }
 
     @PostMapping("/return/{entryID}")
+    @PreAuthorize("hasAuthority('RETURN')")
     public void returnBook(@PathVariable("entryID") UUID entryID){
         studentBookEntryService.returnBook(entryID);
     }

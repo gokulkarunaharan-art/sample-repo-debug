@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,25 +45,30 @@ public class BookController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADD')")
     public ResponseEntity<BookDTO> addBook(@RequestBody @Validated BookDTO bookDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(bookDTO));
     }
 
     @DeleteMapping("/{bookId}")
+    @PreAuthorize("hasAuthority('REMOVE')")
     public void deleteBook(@PathVariable UUID bookId) {
         bookService.deleteBook(bookId);
     }
 
     @PatchMapping("/{bookId}/decrement")
+    @PreAuthorize("hasAuthority('REMOVE')")
     public void decrementBook(@PathVariable("bookId") UUID bookId) {
         bookService.decrementBook(bookId);
     }
 
     @PatchMapping("/{bookId}/increment")
+    @PreAuthorize("hasAuthority('ADD')")
     public void incrementBook(@PathVariable("bookId") UUID bookId) {
         bookService.incrementBook(bookId);
     }
 
+    @PreAuthorize("hasAuthority('ADD')")
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<UploadSummaryDTO> uploadBookCSV(@RequestPart MultipartFile file) throws IOException {
        return ResponseEntity.status(HttpStatus.OK).body(bookService.uploadBookCSV(file));

@@ -29,12 +29,22 @@ public class DataPopulator implements CommandLineRunner {
     }
 
     private void createDefaultMembers() {
-        Member gokul = Member.builder()
-                .userName("gokul")
-                .password(bCryptPasswordEncoder.encode("gokul13122004"))
-                .role(Role.LIBRARIAN)
-                .build();
-        memberRepository.save(gokul);
+        if(!memberRepository.findByUserName("gokul").isPresent()){
+            Member gokul = Member.builder()
+                    .userName("gokul")
+                    .password(bCryptPasswordEncoder.encode("gokul13122004"))
+                    .role(Role.LIBRARIAN)
+                    .build();
+            memberRepository.save(gokul);
+        }
+        if(!memberRepository.findByUserName("kiran").isPresent()){
+            Member kiran = Member.builder()
+                    .userName("kiran")
+                    .password(bCryptPasswordEncoder.encode("kiran@123"))
+                    .role(Role.MEMBER)
+                    .build();
+            memberRepository.save(kiran);
+        }
     }
 
     public void populateBookRepository(){

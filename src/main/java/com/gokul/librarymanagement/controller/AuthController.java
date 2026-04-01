@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,8 @@ public class AuthController {
         String userName = authRequest.getUsername();
         String password = authRequest.getPassword();
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName,password);
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        authenticationManager.authenticate(authenticationToken);
+
         String token = jwtUtil.generateJWT(userName);
         Map<String,String> tokenResponse = new HashMap<>();
         tokenResponse.put("Token: ",token);
