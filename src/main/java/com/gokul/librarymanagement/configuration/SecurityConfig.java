@@ -1,6 +1,6 @@
 package com.gokul.librarymanagement.configuration;
 
-import com.gokul.librarymanagement.service.MemberDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,19 +17,17 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChainManipulations(HttpSecurity httpSecurity){
         httpSecurity.csrf(csrf->csrf.disable());
-        httpSecurity.authorizeHttpRequests(requests-> requests.anyRequest().authenticated());
+        httpSecurity.authorizeHttpRequests(requests-> requests
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated());
         httpSecurity.httpBasic(Customizer.withDefaults());
         return httpSecurity.build();
-    }
-
-    @Bean
-    UserDetailsService userDetailsService(){
-        return new MemberDetailsService();
     }
 
     @Bean

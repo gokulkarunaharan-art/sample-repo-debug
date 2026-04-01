@@ -9,6 +9,7 @@ import com.gokul.librarymanagement.repository.MemberRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +19,7 @@ public class DataPopulator implements CommandLineRunner {
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
     private final MemberRepository memberRepository;
+    private  BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public void run(String... args) throws Exception {
@@ -29,7 +31,7 @@ public class DataPopulator implements CommandLineRunner {
     private void createDefaultMembers() {
         Member gokul = Member.builder()
                 .userName("gokul")
-                .password("gokul13122004")
+                .password(bCryptPasswordEncoder.encode("gokul13122004"))
                 .role(Role.LIBRARIAN)
                 .build();
         memberRepository.save(gokul);
