@@ -123,6 +123,7 @@ public class BookService {
                     .withThrowExceptions(false)
                     .build();
 
+            //name to parsed_csv or more relevent
             List<BookCSVRepresentation> parsed = csvToBean.parse();
 
             //handling all the collected exceptions

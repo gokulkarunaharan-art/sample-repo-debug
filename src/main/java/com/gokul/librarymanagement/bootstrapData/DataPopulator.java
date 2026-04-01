@@ -1,8 +1,11 @@
 package com.gokul.librarymanagement.bootstrapData;
 
 import com.gokul.librarymanagement.model.Book;
+import com.gokul.librarymanagement.model.Member;
+import com.gokul.librarymanagement.model.Role;
 import com.gokul.librarymanagement.model.Student;
 import com.gokul.librarymanagement.repository.BookRepository;
+import com.gokul.librarymanagement.repository.MemberRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -14,12 +17,22 @@ public class DataPopulator implements CommandLineRunner {
 
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public void run(String... args) throws Exception {
         populateBookRepository();
         populateStudentRepository();
+        createDefaultMembers();
+    }
 
+    private void createDefaultMembers() {
+        Member gokul = Member.builder()
+                .userName("gokul")
+                .password("gokul13122004")
+                .role(Role.LIBRARIAN)
+                .build();
+        memberRepository.save(gokul);
     }
 
     public void populateBookRepository(){
