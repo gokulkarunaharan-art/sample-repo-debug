@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChainManipulations(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf(csrf->csrf.disable());
         httpSecurity.authorizeHttpRequests(requests-> requests
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/auth").permitAll()
                 .anyRequest().authenticated());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();

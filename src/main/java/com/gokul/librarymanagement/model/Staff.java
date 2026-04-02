@@ -20,7 +20,7 @@ import java.util.UUID;
 @Table(name = "Members")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Member implements UserDetails {
+public class Staff implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

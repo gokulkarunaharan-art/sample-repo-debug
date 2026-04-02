@@ -45,31 +45,32 @@ public class BookController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADD')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<BookDTO> addBook(@RequestBody @Validated BookDTO bookDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(bookDTO));
     }
 
     @DeleteMapping("/{bookId}")
-    @PreAuthorize("hasAuthority('REMOVE')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public void deleteBook(@PathVariable UUID bookId) {
         bookService.deleteBook(bookId);
     }
 
     @PatchMapping("/{bookId}/decrement")
-    @PreAuthorize("hasAuthority('REMOVE')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public void decrementBook(@PathVariable("bookId") UUID bookId) {
         bookService.decrementBook(bookId);
     }
 
     @PatchMapping("/{bookId}/increment")
-    @PreAuthorize("hasAuthority('ADD')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public void incrementBook(@PathVariable("bookId") UUID bookId) {
         bookService.incrementBook(bookId);
     }
 
-    @PreAuthorize("hasAuthority('ADD')")
+
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<UploadSummaryDTO> uploadBookCSV(@RequestPart MultipartFile file) throws IOException {
        return ResponseEntity.status(HttpStatus.OK).body(bookService.uploadBookCSV(file));
     }

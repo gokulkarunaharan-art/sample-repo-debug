@@ -15,7 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/entry")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('LIBRARIAN')")
+
 public class StudentBookEntryController {
 
     private final StudentBookEntryService studentBookEntryService;
@@ -26,28 +26,29 @@ public class StudentBookEntryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('BORROW')")
     public void borrow(@RequestBody @Validated BorrowRequestDTO borrowRequestDTO){
         studentBookEntryService.studentBookEntryRequest(borrowRequestDTO);
     }
 
     @PostMapping("/return/{entryID}")
-    @PreAuthorize("hasAuthority('RETURN')")
     public void returnBook(@PathVariable("entryID") UUID entryID){
         studentBookEntryService.returnBook(entryID);
     }
 
     @GetMapping("/active")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public List<StudentBookEntryDTO> getAllActiveEntries(){
         return studentBookEntryService.getAllActiveEntries();
     }
 
     @GetMapping("/book/{book_id}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public List<StudentBookEntryDTO> getAllEntriesForBook(@PathVariable("book_id") UUID bookID){
         return studentBookEntryService.getAllEntriesByBook(bookID);
     }
 
     @GetMapping("/student/{student_id}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public List<StudentBookEntryDTO> getAllEntriesForStudent(@PathVariable("student_id") UUID studentID){
         return studentBookEntryService.getAllEntriesByStudent(studentID);
     }

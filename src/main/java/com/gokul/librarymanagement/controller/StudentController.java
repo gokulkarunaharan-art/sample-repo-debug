@@ -23,11 +23,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/student")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('LIBRARIAN')")
 public class StudentController {
 
     private final StudentService studentService;
-    private final BookService bookService;
 
     @GetMapping
     public Page<StudentDTO> getAllStudents(@PageableDefault(size = 25, page = 0, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
@@ -35,16 +33,19 @@ public class StudentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public void addStudent(@RequestBody @Validated StudentDTO studentDTO){
         studentService.addStudent(studentDTO);
     }
 
     @DeleteMapping("/{studentId}")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public void deleteStudent(@PathVariable UUID studentId){
         studentService.deleteStudent(studentId);
     }
 
     @PostMapping("/upload")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity<UploadSummaryDTO> uploadStudentCSV(@RequestPart MultipartFile file) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(studentService.uploadStudentCSV(file));
     }

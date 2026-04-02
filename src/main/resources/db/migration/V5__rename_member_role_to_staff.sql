@@ -1,0 +1,1 @@
+UPDATE members SET role = 'STAFF' WHERE role = 'MEMBER';

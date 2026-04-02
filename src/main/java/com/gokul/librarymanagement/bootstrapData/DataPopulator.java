@@ -1,11 +1,11 @@
 package com.gokul.librarymanagement.bootstrapData;
 
 import com.gokul.librarymanagement.model.Book;
-import com.gokul.librarymanagement.model.Member;
+import com.gokul.librarymanagement.model.Staff;
 import com.gokul.librarymanagement.model.Role;
 import com.gokul.librarymanagement.model.Student;
 import com.gokul.librarymanagement.repository.BookRepository;
-import com.gokul.librarymanagement.repository.MemberRepository;
+import com.gokul.librarymanagement.repository.StaffRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -18,7 +18,7 @@ public class DataPopulator implements CommandLineRunner {
 
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
-    private final MemberRepository memberRepository;
+    private final StaffRepository staffRepository;
     private  BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Override
@@ -29,21 +29,21 @@ public class DataPopulator implements CommandLineRunner {
     }
 
     private void createDefaultMembers() {
-        if(!memberRepository.findByUserName("gokul").isPresent()){
-            Member gokul = Member.builder()
+        if(!staffRepository.findByUserName("gokul").isPresent()){
+            Staff gokul = Staff.builder()
                     .userName("gokul")
                     .password(bCryptPasswordEncoder.encode("gokul13122004"))
                     .role(Role.LIBRARIAN)
                     .build();
-            memberRepository.save(gokul);
+            staffRepository.save(gokul);
         }
-        if(!memberRepository.findByUserName("kiran").isPresent()){
-            Member kiran = Member.builder()
+        if(!staffRepository.findByUserName("kiran").isPresent()){
+            Staff kiran = Staff.builder()
                     .userName("kiran")
                     .password(bCryptPasswordEncoder.encode("kiran@123"))
-                    .role(Role.MEMBER)
+                    .role(Role.STAFF)
                     .build();
-            memberRepository.save(kiran);
+            staffRepository.save(kiran);
         }
     }
 
