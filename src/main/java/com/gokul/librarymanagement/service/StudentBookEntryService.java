@@ -74,8 +74,6 @@ public class StudentBookEntryService {
         oldEntriesOfStudent.add(entry);
         student.setStudentBookEntries(oldEntriesOfStudent);
 
-//        bookRepository.save(book);
-//        studentRepository.save(student);
         studentBookEntryRepository.save(entry);
     }
 
@@ -101,15 +99,9 @@ public class StudentBookEntryService {
 
     public List<StudentBookEntryDTO> getAllEntriesByBook(UUID bookID) {
         return bookService.getAllEntriesByBook(bookID).stream().map(studentBookEntryMapper::toDTO).toList();
-//       return studentBookEntryRepository.findAllByBook_Id(bookID).stream().map(
-//               studentBookEntryMapper::toDTO
-//       ).toList();
     }
 
     public List<StudentBookEntryDTO> getAllEntriesByStudent(UUID studentID) {
         return studentService.getAllEntriesByStudent(studentID).stream().map(studentBookEntryMapper::toDTO).toList();
-//        return studentBookEntryRepository.findAllByStudent_Id(studentID).stream().map(
-//                studentBookEntryMapper::toDTO
-//        ).toList();
     }
 }

@@ -36,7 +36,6 @@ public class StudentBookEntryController {
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasRole('LIBRARIAN')")
     public List<StudentBookEntryDTO> getAllActiveEntries(){
         return studentBookEntryService.getAllActiveEntries();
     }

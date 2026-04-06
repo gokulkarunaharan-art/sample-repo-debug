@@ -1,6 +1,7 @@
 package com.gokul.librarymanagement.controller;
 
 import com.gokul.librarymanagement.DTO.AuthRequestDTO;
+import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.model.Role;
 import com.gokul.librarymanagement.model.Staff;
 import com.gokul.librarymanagement.repository.StaffRepository;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final StaffRepository staffRepository;
     private final PasswordEncoder encoder;
+    private final UserDetailsService userDetailsService;
 
     private  JWTUtil jwtUtil = new JWTUtil();
 
@@ -48,12 +51,16 @@ public class AuthController {
     @PostMapping("/staff")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity addStaff(@RequestBody AuthRequestDTO authRequestDTO){
+        //checking if the username already exists
+        if(staffRepository.existsByUserName(authRequestDTO.getUsername())){
+            throw new OperationNotAllowedException("staff with provided username already exists");
+        }
         Staff newStaff = Staff.builder()
                 .userName(authRequestDTO.getUsername())
                 .password(encoder.encode(authRequestDTO.getPassword()))
                 .role(Role.STAFF)
                 .build();
-        Staff savedStaff = staffRepository.save(newStaff);
+        staffRepository.save(newStaff);
         return ResponseEntity.ok("Staff created");
     }
 }
