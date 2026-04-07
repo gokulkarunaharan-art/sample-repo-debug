@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +29,6 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final StaffRepository staffRepository;
     private final PasswordEncoder encoder;
-    private final UserDetailsService userDetailsService;
 
     private  JWTUtil jwtUtil = new JWTUtil();
 
@@ -39,6 +36,7 @@ public class AuthController {
     public ResponseEntity<Map<String,String>> generateToken(@RequestBody AuthRequestDTO authRequest){
         String userName = authRequest.getUsername();
         String password = authRequest.getPassword();
+        //move logic to another file
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName,password);
         authenticationManager.authenticate(authenticationToken);
 
@@ -48,6 +46,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(tokenResponse);
     }
 
+    //move to another controller
     @PostMapping("/staff")
     @PreAuthorize("hasRole('LIBRARIAN')")
     public ResponseEntity addStaff(@RequestBody AuthRequestDTO authRequestDTO){
