@@ -5,17 +5,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+@Component
 public  class JWTUtil {
 
     private static final long EXPIRY_DURATION = 1000*60*60;
     private static final String secret = "whatarethecausesandconsequencesofsoilerosion";
     private static final SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 
-    public static String generateJWT(String username){
+    public  String generateJWT(String username){
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())

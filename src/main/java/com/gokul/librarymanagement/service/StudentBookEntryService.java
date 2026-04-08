@@ -2,7 +2,7 @@ package com.gokul.librarymanagement.service;
 
 import com.gokul.librarymanagement.DTO.StudentBookEntryDTO;
 import com.gokul.librarymanagement.DTO.BorrowRequestDTO;
-import com.gokul.librarymanagement.exception.BorrowLimitExceededException;
+import com.gokul.librarymanagement.exception.OperationNotAllowedException;
 import com.gokul.librarymanagement.exception.ResourceNotFoundException;
 import com.gokul.librarymanagement.mapper.StudentBookEntryMapper;
 import com.gokul.librarymanagement.model.Book;
@@ -51,7 +51,7 @@ public class StudentBookEntryService {
         }
         //checking if the user already taken the book
         if (studentBookEntryRepository.findByBookAndStudentAndStatus(book, student, BorrowStatus.ACTIVE).isPresent()) {
-            throw new BorrowLimitExceededException();
+            throw new OperationNotAllowedException("Borrow Limit Exceeded");
         }
 
         StudentBookEntry entry = StudentBookEntry.builder()
@@ -78,17 +78,12 @@ public class StudentBookEntryService {
     }
 
     public void returnBook(UUID entryID) {
-
-        if (studentBookEntryRepository.findById(entryID).isPresent()) {
-            StudentBookEntry entry = studentBookEntryRepository.findById(entryID).get();
-            Book book = entry.getBook();
-            book.setAvailableCopies(book.getAvailableCopies() + 1);
-            entry.setReturnedAt(LocalDateTime.now());
-            entry.setStatus(BorrowStatus.RETURNED);
-            studentBookEntryRepository.save(entry);
-        } else {
-            throw new ResourceNotFoundException("Entry Not Found With ID " + entryID);
-        }
+        StudentBookEntry entry = studentBookEntryRepository.findById(entryID).orElseThrow(() -> new ResourceNotFoundException("Entry with provided id is not found"));
+        Book book = entry.getBook();
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+        entry.setReturnedAt(LocalDateTime.now());
+        entry.setStatus(BorrowStatus.RETURNED);
+        studentBookEntryRepository.save(entry);
     }
 
     public List<StudentBookEntryDTO> getAllActiveEntries() {

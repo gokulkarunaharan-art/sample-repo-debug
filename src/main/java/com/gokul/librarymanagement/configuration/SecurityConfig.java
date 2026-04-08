@@ -4,6 +4,7 @@ import com.gokul.librarymanagement.filter.JWTAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -24,6 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@Profile("!test")
 public class SecurityConfig {
 
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
@@ -33,7 +35,7 @@ public class SecurityConfig {
         httpSecurity.csrf(csrf->csrf.disable());
         httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         httpSecurity.authorizeHttpRequests(requests-> requests
-                .requestMatchers("/auth").permitAll()
+                .requestMatchers("/auth","/v3/api-docs**","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated());
         httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
@@ -51,22 +53,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/api/**", config);
         source.registerCorsConfiguration("/auth/**", config);  // also cover /auth!
         return source;
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,PasswordEncoder passwordEncoder){
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-        return daoAuthenticationProvider;
-    }
-
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationProvider authenticationProvider){
-        return new ProviderManager(authenticationProvider);
     }
 }

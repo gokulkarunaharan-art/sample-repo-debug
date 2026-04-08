@@ -24,6 +24,7 @@ import java.util.UUID;
 @RequestMapping("/api/book")
 @RequiredArgsConstructor
 public class BookController {
+
     private final BookService bookService;
 
     @GetMapping

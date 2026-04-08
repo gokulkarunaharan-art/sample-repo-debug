@@ -9,7 +9,7 @@ import com.gokul.librarymanagement.repository.StaffRepository;
 import com.gokul.librarymanagement.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,31 +19,23 @@ public class DataPopulator implements CommandLineRunner {
     private final BookRepository bookRepository;
     private final StudentRepository studentRepository;
     private final StaffRepository staffRepository;
-    private  BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
         populateBookRepository();
         populateStudentRepository();
-        createDefaultMembers();
+        createLibrarian();
     }
 
-    private void createDefaultMembers() {
+    private void createLibrarian() {
         if(!staffRepository.findByUserName("gokul").isPresent()){
             Staff gokul = Staff.builder()
                     .userName("gokul")
-                    .password(bCryptPasswordEncoder.encode("gokul13122004"))
+                    .password(passwordEncoder.encode("gokul13122004"))
                     .role(Role.LIBRARIAN)
                     .build();
             staffRepository.save(gokul);
-        }
-        if(!staffRepository.findByUserName("kiran").isPresent()){
-            Staff kiran = Staff.builder()
-                    .userName("kiran")
-                    .password(bCryptPasswordEncoder.encode("kiran@123"))
-                    .role(Role.STAFF)
-                    .build();
-            staffRepository.save(kiran);
         }
     }
 

@@ -13,11 +13,6 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BorrowLimitExceededException.class)
-    public ResponseEntity<String> handleBorrowLimitExceededException() {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot take two copies of the same book");
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
 
